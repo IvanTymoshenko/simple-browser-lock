@@ -9,9 +9,6 @@ function generateRecoveryCode() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// YOUR DONATION LINK
-const DONATION_URL = "https://buymeacoffee.com/mr.ivan.tymoshenko";
-
 document.addEventListener('DOMContentLoaded', () => {
     // Views
     const viewSetup = document.getElementById('view-setup');
@@ -152,14 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 recoveryMsg.textContent = "Invalid Recovery Code";
                 recoveryMsg.className = "status-msg error-msg";
             }
-        });
-    });
-
-    // 5. DONATION BUTTON (UNLOCKED STATE -> NEW TAB)
-    const donateButtons = document.querySelectorAll('.donate-btn');
-    donateButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            chrome.tabs.create({ url: DONATION_URL });
         });
     });
 });

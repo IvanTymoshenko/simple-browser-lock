@@ -59,7 +59,6 @@
         }
         button:hover { background: #b4befe; transform: translateY(-2px); }
         button:disabled { background: #45475a; color: #7f849c; cursor: not-allowed; transform: none; }
-        
         /* Error Message */
         #err { color: #f38ba8; margin-top: 15px; display: none; font-weight: bold; font-size: 14px; }
         
@@ -76,21 +75,6 @@
         }
         .link-btn:hover { background: none; color: #89b4fa; transform: none; }
 
-        /* Support Button (Gold Theme) */
-        button.donate-btn {
-            background: #252538; 
-            border: 2px solid #f9e2af; 
-            color: #f9e2af; 
-            margin-top: 25px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-        button.donate-btn:hover { background: #f9e2af; color: #252538; transform: translateY(-2px); }
-
         .hidden { display: none; }
     </style>
 </head>
@@ -104,8 +88,6 @@
             <input type="password" id="pass" placeholder="Password" autofocus>
             <button id="unlock">Unlock</button>
             <button id="btn-forgot" class="link-btn">Forgot Password?</button>
-            
-            <button class="donate-btn" id="lock-donate">Support Developer</button>
         </div>
 
         <div id="view-recovery" class="hidden">

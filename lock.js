@@ -68,12 +68,3 @@ recoverBtn.addEventListener('click', () => {
         }
     });
 });
-
-// --- SUPPORT BUTTON (LOCKED STATE -> POPUP WINDOW) ---
-const lockDonateBtn = document.getElementById('lock-donate');
-if (lockDonateBtn) {
-    lockDonateBtn.addEventListener('click', () => {
-        // We use the background script to open a window because we are locked
-        chrome.runtime.sendMessage({ action: "openSupport" });
-    });
-}

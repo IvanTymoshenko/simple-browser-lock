@@ -9,9 +9,6 @@ async function hashText(text) {
 let isUnlocking = false;
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
-// *** YOUR DONATION LINK ***
-const DONATION_URL = "https://buymeacoffee.com/mr.ivan.tymoshenko"; 
-
 // --- SMART SETUP REMINDER ---
 async function checkSetupNeeded() {
     const data = await chrome.storage.local.get(['masterHash', 'nextReminder']);
@@ -60,12 +57,8 @@ async function lockBrowser() {
         allWindows.forEach(win => {
             // 1. Keep the Lock Window open
             if (existingLockWindow && win.id === existingLockWindow.id) return;
-
-            // 2. Keep the Support Window open (Exception Rule)
-            const isSupportWindow = win.tabs.some(t => t.url.includes("buymeacoffee.com"));
-            if (isSupportWindow) return;
             
-            // 3. Close everything else
+            // 2. Close everything else
             chrome.windows.remove(win.id).catch(() => {});
         });
 
@@ -143,19 +136,6 @@ chrome.runtime.onInstalled.addListener(lockBrowser);
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     
-    // --- OPEN SUPPORT WINDOW (Called when Locked) ---
-    if (request.action === "openSupport") {
-        chrome.windows.create({
-            url: DONATION_URL,
-            type: "popup",
-            width: 500,
-            height: 700,
-            focused: true
-        });
-        sendResponse({ success: true });
-        return true;
-    }
-
     if (request.action === "validatePassword") {
         if (isUnlocking) return true;
         isUnlocking = true;
