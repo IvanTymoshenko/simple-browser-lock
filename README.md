@@ -24,7 +24,7 @@ Install manually using the steps below:
 
 If you find this tool useful, you can support me here:
 
-[**Buy me a coffee**](https://buymeacoffee.com/mr.ivan.tymoshenko)
+<a href="https://buymeacoffee.com/mr.ivan.tymoshenko" target="_blank"><strong>Buy me a coffee</strong></a>
 
 ### Privacy Policy
 This extension does not collect, store, or transmit any personal user data to external servers. All passwords, recovery codes, and session data are stored locally on your device using Chrome's local storage API.
