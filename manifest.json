@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Simple Browser Lock",
-  "version": "1.1",
+  "version": "1.0.5",
   "description": "Lock your browser with a password. Secure and simple.",
   "author": "Ivan Tymoshenko",
   "permissions": [

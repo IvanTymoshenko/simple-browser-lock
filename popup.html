@@ -2,41 +2,53 @@
 <html>
 <head>
     <style>
-        /* Popup Body (Dark Theme, Fixed Size) */
+        /* --- Layout & Base --- */
         body { 
             width: 360px; 
             height: 100vh; 
             padding: 25px; 
+            margin: 0 auto; 
+            box-sizing: border-box; 
+            overflow: hidden; 
             font-family: 'Segoe UI', sans-serif; 
             background: #252538; 
             color: #cdd6f4; 
-            overflow: hidden; 
-            margin: 0 auto; 
-            box-sizing: border-box; 
         }
         .hidden { display: none; }
+        .divider { border-top: 1px solid #45475a; margin: 25px 0; }
         
-        /* Headers */
-        h3 { margin-top: 10px; text-align: center; color: #fff; font-size: 22px; margin-bottom: 10px; font-weight: 600; }
-        p { font-size: 14px; color: #a6adc8; margin-bottom: 25px; line-height: 1.5; text-align: center; }
+        /* --- Typography --- */
+        h3 { 
+            margin-top: 10px; margin-bottom: 10px; 
+            text-align: center; font-size: 22px; font-weight: 600; color: #fff; 
+        }
+        p { 
+            margin-bottom: 25px; 
+            font-size: 14px; line-height: 1.5; text-align: center; color: #a6adc8; 
+        }
         
-        /* Inputs */
+        /* --- Forms --- */
         input { 
-            width: 100%; margin-bottom: 15px; padding: 14px; box-sizing: border-box; 
-            border: 2px solid #313244; background: #181825; color: white;
-            border-radius: 8px; font-size: 15px; outline: none; transition: 0.3s;
+            width: 100%; margin-bottom: 15px; padding: 14px; 
+            box-sizing: border-box; border-radius: 8px; 
+            border: 2px solid #313244; background: #181825; color: white; 
+            font-size: 15px; outline: none; transition: 0.3s;
         }
         input:focus { border-color: #89b4fa; }
 
-        /* Buttons */
+        /* --- Buttons --- */
         button { 
-            width: 100%; padding: 14px; background: #89b4fa; color: #1e1e2e; border: none; 
-            border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 8px; 
-            font-size: 15px; transition: 0.2s; 
+            width: 100%; padding: 14px; margin-top: 8px; 
+            border: none; border-radius: 8px; 
+            background: #89b4fa; color: #1e1e2e; 
+            font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; 
         }
         button:hover { background: #b4befe; transform: translateY(-2px); }
         
-        button.lock-btn { background: #f38ba8; margin-bottom: 25px; padding: 16px; font-size: 17px; color: #1e1e2e; }
+        button.lock-btn { 
+            background: #f38ba8; margin-bottom: 25px; padding: 16px; 
+            font-size: 17px; color: #1e1e2e; 
+        }
         button.lock-btn:hover { background: #eba0b3; }
 
         button.secondary-btn {
@@ -44,21 +56,28 @@
         }
         button.secondary-btn:hover { background: #313244; color: #fff; transform: none; }
 
-        /* Recovery Box */
-        .recovery-box { background: #313244; border: 2px dashed #f9e2af; padding: 20px; border-radius: 8px; margin-top: 15px; text-align: center; }
-        .code-display { font-family: monospace; font-size: 22px; font-weight: bold; color: #f9e2af; letter-spacing: 2px; margin: 15px 0; display: block; background: #181825; padding: 12px; border-radius: 6px; }
+        .link-btn { 
+            background: none; border: none; width: 100%; padding: 5px; margin-top: 15px; 
+            color: #a6adc8; font-size: 13px; text-align: center; 
+            text-decoration: underline; cursor: pointer; transform: none;
+        }
+        .link-btn:hover { background: none; color: #89b4fa; transform: none; }
+
+        /* --- Recovery & Status --- */
+        .recovery-box { 
+            background: #313244; border: 2px dashed #f9e2af; 
+            padding: 20px; border-radius: 8px; margin-top: 15px; text-align: center; 
+        }
+        .code-display { 
+            display: block; margin: 15px 0; padding: 12px; 
+            background: #181825; border-radius: 6px; 
+            font-family: monospace; font-size: 22px; font-weight: bold; 
+            color: #f9e2af; letter-spacing: 2px; 
+        }
         
-        .divider { border-top: 1px solid #45475a; margin: 25px 0; }
         .status-msg { margin-top: 15px; font-size: 13px; text-align: center; font-weight: bold; min-height: 20px; }
         .error-msg { color: #f38ba8; }
         .success-msg { color: #a6e3a1; }
-
-        .link-btn { 
-            background: none; color: #a6adc8; font-size: 13px; margin-top: 15px; 
-            text-decoration: underline; padding: 5px; width: 100%; text-align: center;
-            border: none; cursor: pointer; transform: none;
-        }
-        .link-btn:hover { background: none; color: #89b4fa; transform: none; }
     </style>
 </head>
 <body>

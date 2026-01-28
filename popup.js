@@ -1,3 +1,4 @@
+// --- Utilities ---
 async function hashText(text) {
     const msgBuffer = new TextEncoder().encode(text);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -10,13 +11,12 @@ function generateRecoveryCode() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Views
+    // --- UI Elements ---
     const viewSetup = document.getElementById('view-setup');
     const viewDashboard = document.getElementById('view-dashboard');
     const viewRecovery = document.getElementById('view-recovery');
     const recoveryResult = document.getElementById('recovery-result');
     
-    // Elements
     const setupInputs = document.querySelectorAll('#view-setup input');
     const saveBtn = document.getElementById('btn-save');
     const laterBtn = document.getElementById('btn-later');
@@ -31,12 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 2. Lock Button
     document.getElementById('btn-lock-now').addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: "manualLock" });
         window.close();
     });
 
-    // 2. SETUP LOGIC (First Time)
+    // 3. Setup Logic (First Time)
     saveBtn.addEventListener('click', async () => {
         const p1 = document.getElementById('setup-pass').value;
         const p2 = document.getElementById('setup-confirm').value;
@@ -53,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 isLocked: false 
             });
 
-            // Show Recovery Code
+            // Display Recovery Code
             laterBtn.style.display = 'none';
             setupInputs.forEach(i => i.classList.add('hidden'));
             saveBtn.classList.add('hidden');
@@ -68,10 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Close buttons for setup
     laterBtn.addEventListener('click', () => window.close());
     document.getElementById('btn-finish-setup').addEventListener('click', () => window.close());
 
-    // 3. CHANGE PASSWORD LOGIC (Generates NEW Code)
+    // 4. Change Password Logic
     document.getElementById('btn-change').addEventListener('click', async () => {
         const oldPass = document.getElementById('change-old').value;
         const newPass = document.getElementById('change-new').value;
@@ -83,22 +85,21 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.local.get(['masterHash'], async (result) => {
             if (result.masterHash === oldHash) {
                 if(newPass === confirmPass && newPass) {
-                    // 1. New Password Hash
+                    // Update Password
                     const newHash = await hashText(newPass);
                     
-                    // 2. NEW Recovery Code
+                    // Generate NEW Recovery Code (Security Best Practice)
                     const newRecoveryCode = generateRecoveryCode();
                     const newRecoveryHash = await hashText(newRecoveryCode);
 
-                    // 3. Save Both
                     await chrome.storage.local.set({ 
                         masterHash: newHash,
                         recoveryHash: newRecoveryHash 
                     });
 
-                    // 4. Show User the New Code
+                    // Show Success & New Code
                     viewDashboard.classList.add('hidden');
-                    viewSetup.classList.remove('hidden'); // Reuse setup screen
+                    viewSetup.classList.remove('hidden'); 
                     
                     document.querySelector('#view-setup h3').textContent = "Password Updated";
                     document.querySelector('#view-setup > p').textContent = "Here is your NEW recovery code. The old one is invalid.";
@@ -123,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 4. RECOVERY LOGIC
+    // 5. Recovery Logic
     document.getElementById('btn-goto-recovery').addEventListener('click', () => {
         viewDashboard.classList.add('hidden');
         viewRecovery.classList.remove('hidden');

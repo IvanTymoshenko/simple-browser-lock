@@ -1,4 +1,12 @@
-// 1. Utility: Hash Function (SHA-256)
+/**
+ * Simple Browser Lock - Background Service Worker
+ */
+
+// --- Constants & Config ---
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+let isUnlocking = false;
+
+// --- Utility: SHA-256 Hash Function ---
 async function hashText(text) {
     const msgBuffer = new TextEncoder().encode(text);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -6,15 +14,15 @@ async function hashText(text) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-let isUnlocking = false;
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-
-// --- SMART SETUP REMINDER ---
+// --- Feature: Smart Setup Reminder ---
 async function checkSetupNeeded() {
     const data = await chrome.storage.local.get(['masterHash', 'nextReminder']);
+    
+    // If password exists, no reminder needed.
     if (data.masterHash) return;
 
     const now = Date.now();
+    // Remind if never reminded OR if last reminder was > 7 days ago
     if (!data.nextReminder || now > data.nextReminder) {
         openSetupWindow();
         await chrome.storage.local.set({ nextReminder: now + SEVEN_DAYS_MS });
@@ -23,6 +31,7 @@ async function checkSetupNeeded() {
 
 function openSetupWindow() {
     chrome.tabs.query({}, (tabs) => {
+        // Prevent opening multiple setup windows
         const existingSetup = tabs.find(t => t.url.includes("popup.html?mode=setup"));
         if (existingSetup) {
             chrome.windows.update(existingSetup.windowId, { focused: true });
@@ -38,10 +47,11 @@ function openSetupWindow() {
     });
 }
 
-// 2. The Core Locking Logic
+// --- Core Logic: Locking the Browser ---
 async function lockBrowser() {
     const data = await chrome.storage.local.get(['masterHash', 'isLocked', 'savedSession']);
     
+    // If no password is set, check if we need to remind the user instead of locking
     if (!data.masterHash) {
         checkSetupNeeded();
         return;
@@ -49,16 +59,15 @@ async function lockBrowser() {
 
     const allWindows = await chrome.windows.getAll({ populate: true });
 
+    // Scenario 1: Already Locked - Maintain the Lock Window
     if (data.isLocked) {
         const existingLockWindow = allWindows.find(win => 
             win.tabs.some(tab => tab.url.includes("lock.html"))
         );
 
         allWindows.forEach(win => {
-            // 1. Keep the Lock Window open
+            // Keep the lock window, close everything else
             if (existingLockWindow && win.id === existingLockWindow.id) return;
-            
-            // 2. Close everything else
             chrome.windows.remove(win.id).catch(() => {});
         });
 
@@ -70,11 +79,12 @@ async function lockBrowser() {
         return;
     }
 
-    // Saving Session (Only if unlocked)
+    // Scenario 2: Fresh Lock - Save Session and Close Windows
     let rawUrls = [];
     let originalBounds = null;
 
     if (allWindows.length > 0) {
+        // Capture window size to restore later
         const normalWin = allWindows.find(w => w.type === 'normal') || allWindows[0];
         originalBounds = {
             width: normalWin.width,
@@ -83,6 +93,7 @@ async function lockBrowser() {
             left: normalWin.left
         };
 
+        // Capture all open tabs (excluding internal pages)
         allWindows.forEach(win => {
             win.tabs.forEach(tab => {
                 const isExtensionPage = tab.url.includes(chrome.runtime.id);
@@ -94,6 +105,7 @@ async function lockBrowser() {
         });
     }
 
+    // Remove duplicates
     const uniqueUrls = [...new Set(rawUrls)];
 
     await chrome.storage.local.set({ 
@@ -113,6 +125,7 @@ function createLockWindow(windowsToClose = []) {
         height: 550,
         focused: true
     }, (newWin) => {
+        // Close old windows after the lock screen is safely created
         windowsToClose.forEach(win => {
             if (win.id !== newWin.id) {
                 chrome.windows.remove(win.id).catch(() => {});
@@ -121,7 +134,55 @@ function createLockWindow(windowsToClose = []) {
     });
 }
 
-// 3. Event Listeners
+// --- Helper: Unlocking ---
+async function performUnlock(data) {
+    const dirtySession = data.savedSession || [];
+    const cleanSession = [...new Set(dirtySession)];
+    const bounds = data.windowBounds;
+
+    await chrome.storage.local.set({ isLocked: false, savedSession: [] });
+    
+    const currentWindows = await chrome.windows.getAll();
+
+    const winOptions = {
+        url: cleanSession.length > 0 ? cleanSession : "chrome://newtab/",
+        focused: true,
+        type: "normal"
+    };
+    if (bounds) Object.assign(winOptions, bounds);
+
+    chrome.windows.create(winOptions, (newWin) => {
+        // Close the lock screen
+        currentWindows.forEach(oldWin => {
+            if (oldWin.id !== newWin.id) {
+                chrome.windows.remove(oldWin.id).catch(() => {});
+            }
+        });
+        
+        // Clean up any duplicate tabs that might have spawned (500ms delay)
+        setTimeout(() => {
+            chrome.tabs.query({ windowId: newWin.id }, (tabs) => {
+                const seenUrls = new Set();
+                tabs.forEach(tab => {
+                    const url = tab.pendingUrl || tab.url;
+                    if (url && url.startsWith('http')) {
+                        if (seenUrls.has(url)) {
+                            chrome.tabs.remove(tab.id);
+                        } else {
+                            seenUrls.add(url);
+                        }
+                    }
+                });
+            });
+        }, 500);
+
+        setTimeout(() => { isUnlocking = false; }, 1000);
+    });
+}
+
+// --- Event Listeners ---
+
+// 1. Navigation Guard
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
     if (details.frameId !== 0) return;
     chrome.storage.local.get(['isLocked'], (data) => {
@@ -131,11 +192,14 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
     });
 });
 
+// 2. Startup & Installation
 chrome.runtime.onStartup.addListener(lockBrowser);
 chrome.runtime.onInstalled.addListener(lockBrowser);
 
+// 3. Message Handling
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     
+    // Validate Password
     if (request.action === "validatePassword") {
         if (isUnlocking) return true;
         isUnlocking = true;
@@ -160,6 +224,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true; 
     }
 
+    // Validate Recovery Code
     if (request.action === "validateRecovery") {
         (async () => {
             const inputCodeHash = await hashText(request.recoveryCode);
@@ -167,6 +232,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             if (data.recoveryHash === inputCodeHash) {
                 await performUnlock(data);
+                // Reset credentials so user must set new ones
                 await chrome.storage.local.remove(['masterHash', 'recoveryHash']);
                 openSetupWindow();
                 sendResponse({ success: true });
@@ -177,51 +243,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true;
     }
     
+    // Manual Lock Trigger
     if (request.action === "manualLock") {
         lockBrowser();
         sendResponse({ success: true });
     }
 });
-
-async function performUnlock(data) {
-    const dirtySession = data.savedSession || [];
-    const cleanSession = [...new Set(dirtySession)];
-    const bounds = data.windowBounds;
-
-    await chrome.storage.local.set({ isLocked: false, savedSession: [] });
-    
-    const currentWindows = await chrome.windows.getAll();
-
-    const winOptions = {
-        url: cleanSession.length > 0 ? cleanSession : "chrome://newtab/",
-        focused: true,
-        type: "normal"
-    };
-    if (bounds) Object.assign(winOptions, bounds);
-
-    chrome.windows.create(winOptions, (newWin) => {
-        currentWindows.forEach(oldWin => {
-            if (oldWin.id !== newWin.id) {
-                chrome.windows.remove(oldWin.id).catch(() => {});
-            }
-        });
-        
-        setTimeout(() => {
-            chrome.tabs.query({ windowId: newWin.id }, (tabs) => {
-                const seenUrls = new Set();
-                tabs.forEach(tab => {
-                    const url = tab.pendingUrl || tab.url;
-                    if (url && url.startsWith('http')) {
-                        if (seenUrls.has(url)) {
-                            chrome.tabs.remove(tab.id);
-                        } else {
-                            seenUrls.add(url);
-                        }
-                    }
-                });
-            });
-        }, 500);
-
-        setTimeout(() => { isUnlocking = false; }, 1000);
-    });
-}

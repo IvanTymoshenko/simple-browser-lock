@@ -1,3 +1,4 @@
+// --- Elements ---
 const unlockBtn = document.getElementById('unlock');
 const passwordInput = document.getElementById('pass');
 const errorMsg = document.getElementById('err');
@@ -9,7 +10,7 @@ const recoveryInput = document.getElementById('recovery-code');
 const viewLock = document.getElementById('view-lock');
 const viewRecovery = document.getElementById('view-recovery');
 
-// --- UNLOCK LOGIC ---
+// --- Unlock Logic ---
 function triggerUnlock() {
     unlockBtn.disabled = true;
     passwordInput.disabled = true;
@@ -37,7 +38,7 @@ passwordInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') triggerUnlock();
 });
 
-// --- FORGOT PASSWORD LOGIC ---
+// --- Forgot Password View Switch ---
 forgotBtn.addEventListener('click', () => {
     viewLock.classList.add('hidden');
     viewRecovery.classList.remove('hidden');
@@ -50,6 +51,7 @@ backBtn.addEventListener('click', () => {
     errorMsg.style.display = 'none';
 });
 
+// --- Recovery Logic ---
 recoverBtn.addEventListener('click', () => {
     const code = recoveryInput.value.trim();
     if (!code) return;
@@ -59,7 +61,7 @@ recoverBtn.addEventListener('click', () => {
 
     chrome.runtime.sendMessage({ action: "validateRecovery", recoveryCode: code }, (res) => {
         if (res && res.success) {
-            // Success
+            // Success - Background will unlock and trigger setup
         } else {
             recoverBtn.disabled = false;
             recoverBtn.textContent = "Reset & Unlock";

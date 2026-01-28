@@ -3,79 +3,53 @@
 <head>
     <title>Simple Browser Lock</title>
     <style>
-        /* Main Background */
+        /* --- Layout --- */
         body { 
-            background: #1e1e2e; 
-            color: #cdd6f4; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            overflow: hidden;
+            height: 100vh; margin: 0; 
+            display: flex; justify-content: center; align-items: center; 
+            background: #1e1e2e; color: #cdd6f4; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden;
         }
-        /* Central Card */
         .box { 
-            text-align: center; 
-            width: 350px;
-            padding: 40px;
-            background: #252538;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            width: 350px; padding: 40px; 
+            background: #252538; border-radius: 16px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center; 
         }
-        /* Logo */
+        .hidden { display: none; }
+
+        /* --- Typography --- */
         img.logo { width: 80px; margin-bottom: 20px; }
-        /* Typography */
         h1 { font-size: 24px; margin: 0 0 10px 0; font-weight: 600; }
-        p { color: #a6adc8; margin-bottom: 30px; font-size: 14px; }
-        /* Input Field */
+        p { margin-bottom: 30px; font-size: 14px; color: #a6adc8; }
+        
+        /* --- Forms --- */
         input { 
-            padding: 15px; 
-            width: 100%; 
-            box-sizing: border-box;
-            border-radius: 8px; 
-            border: 2px solid #313244; 
-            background: #181825; 
-            color: white; 
-            margin-bottom: 15px; 
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
+            width: 100%; margin-bottom: 15px; padding: 15px; 
+            box-sizing: border-box; border-radius: 8px; 
+            border: 2px solid #313244; background: #181825; color: white; 
+            font-size: 16px; outline: none; transition: 0.3s;
         }
         input:focus { border-color: #89b4fa; }
-        /* Primary Button */
+        
+        /* --- Buttons --- */
         button { 
-            width: 100%;
-            padding: 15px; 
-            background: #89b4fa; 
-            color: #1e1e2e; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 16px;
-            transition: 0.2s;
+            width: 100%; padding: 15px; 
+            border: none; border-radius: 8px; 
+            background: #89b4fa; color: #1e1e2e; 
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s;
         }
         button:hover { background: #b4befe; transform: translateY(-2px); }
         button:disabled { background: #45475a; color: #7f849c; cursor: not-allowed; transform: none; }
-        /* Error Message */
-        #err { color: #f38ba8; margin-top: 15px; display: none; font-weight: bold; font-size: 14px; }
         
-        /* Link Button */
         .link-btn { 
-            background: none; 
-            color: #6c7086; 
-            font-size: 13px; 
-            margin-top: 15px; 
-            text-decoration: underline; 
-            padding: 5px; 
-            width: auto; 
-            display: inline-block;
+            display: inline-block; width: auto; margin-top: 15px; padding: 5px; 
+            background: none; color: #6c7086; 
+            font-size: 13px; text-decoration: underline; 
         }
         .link-btn:hover { background: none; color: #89b4fa; transform: none; }
 
-        .hidden { display: none; }
+        /* --- Status --- */
+        #err { margin-top: 15px; display: none; font-weight: bold; font-size: 14px; color: #f38ba8; }
     </style>
 </head>
 <body>
