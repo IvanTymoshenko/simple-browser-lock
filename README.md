@@ -7,8 +7,8 @@ I just wanted to have a tool that can lock my account from other people at work,
 ### Features
 * **Instant Lock:** Hides all open tabs and windows immediately.
 * **Privacy First:** No data leaves your computer. Passwords are hashed locally.
-* **Dark Mode:** Beautiful, modern interface.
-* **Recovery System:** Never get locked out—includes a secure recovery code system.
+* **Dark Mode:** Kinda modern interface.
+* **Recovery System:** Includes recovery code system.
 * **Smart Restore:** Tabs are restored exactly as you left them upon unlocking.
 
 ### How to Install
