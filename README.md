@@ -28,3 +28,6 @@ If you find this tool useful, you can support me here:
 
 ### Privacy Policy
 This extension does not collect, store, or transmit any personal user data to external servers. All passwords, recovery codes, and session data are stored locally on your device using Chrome's local storage API.
+
+Icon was made by:
+<a href="https://www.flaticon.com/free-icons/password" title="password icons" target="_blank">heisenberg_jr - Flaticon</a>
