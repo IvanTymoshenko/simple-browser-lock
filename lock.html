@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Browser Lock</title>
+    <style>
+        /* Main Background */
+        body { 
+            background: #1e1e2e; 
+            color: #cdd6f4; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            overflow: hidden;
+        }
+        /* Central Card */
+        .box { 
+            text-align: center; 
+            width: 350px;
+            padding: 40px;
+            background: #252538;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        /* Logo */
+        img.logo { width: 80px; margin-bottom: 20px; }
+        /* Typography */
+        h1 { font-size: 24px; margin: 0 0 10px 0; font-weight: 600; }
+        p { color: #a6adc8; margin-bottom: 30px; font-size: 14px; }
+        /* Input Field */
+        input { 
+            padding: 15px; 
+            width: 100%; 
+            box-sizing: border-box;
+            border-radius: 8px; 
+            border: 2px solid #313244; 
+            background: #181825; 
+            color: white; 
+            margin-bottom: 15px; 
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #89b4fa; }
+        /* Primary Button */
+        button { 
+            width: 100%;
+            padding: 15px; 
+            background: #89b4fa; 
+            color: #1e1e2e; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        button:hover { background: #b4befe; transform: translateY(-2px); }
+        button:disabled { background: #45475a; color: #7f849c; cursor: not-allowed; transform: none; }
+        
+        /* Error Message */
+        #err { color: #f38ba8; margin-top: 15px; display: none; font-weight: bold; font-size: 14px; }
+        
+        /* Link Button */
+        .link-btn { 
+            background: none; 
+            color: #6c7086; 
+            font-size: 13px; 
+            margin-top: 15px; 
+            text-decoration: underline; 
+            padding: 5px; 
+            width: auto; 
+            display: inline-block;
+        }
+        .link-btn:hover { background: none; color: #89b4fa; transform: none; }
+
+        /* Support Button (Gold Theme) */
+        button.donate-btn {
+            background: #252538; 
+            border: 2px solid #f9e2af; 
+            color: #f9e2af; 
+            margin-top: 25px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+        button.donate-btn:hover { background: #f9e2af; color: #252538; transform: translateY(-2px); }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <img src="icon.png" class="logo">
+        
+        <div id="view-lock">
+            <h1>Browser Locked</h1>
+            <p>Enter your master password</p>
+            <input type="password" id="pass" placeholder="Password" autofocus>
+            <button id="unlock">Unlock</button>
+            <button id="btn-forgot" class="link-btn">Forgot Password?</button>
+            
+            <button class="donate-btn" id="lock-donate">Support Developer</button>
+        </div>
+
+        <div id="view-recovery" class="hidden">
+            <h1 style="color: #f9e2af;">Recovery Mode</h1>
+            <p>Enter your 6-digit recovery code.</p>
+            <input type="text" id="recovery-code" placeholder="123456" maxlength="6" style="text-align: center; letter-spacing: 5px; font-weight: bold; font-size: 18px;">
+            <button id="btn-recover" style="background: #f9e2af; color: #333;">Reset & Unlock</button>
+            <button id="btn-back" class="link-btn">Back to Login</button>
+        </div>
+
+        <div id="err">Incorrect Password</div>
+    </div>
+    <script src="lock.js"></script>
+</body>
+</html>
